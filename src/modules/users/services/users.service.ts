@@ -1,32 +1,34 @@
-/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import { IUser } from '../interfaces/user.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
-  private readonly users: IUser[] = [];
+    constructor(
+        @InjectRepository(User)
+        private usersRepository: Repository<User>,
+    ) {}
 
-  create(createUserDto: CreateUserDto): IUser {
-    const user: IUser = {
-      id: this.users.length + 1,
-      ...createUserDto,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.users.push(user);
-    return user;
-  }
-
-  findAll(): IUser[] {
-    return this.users;
-  }
-
-  findOne(id: number): IUser {
-    const user = this.users.find(user => user.id === id);
-    if (!user) {
-      throw new Error(`User with id ${id} not found`);
+    async create(createUserDto: CreateUserDto): Promise<User> {
+        const user = this.usersRepository.create(createUserDto);
+        return await this.usersRepository.save(user);
     }
-    return user;
-  }
-} 
+
+    async findAll(): Promise<User[]> {
+        return await this.usersRepository.find();
+    }
+
+    async findOne(id: number): Promise<User> {
+        const user = await this.usersRepository.findOne({ where: { id } });
+        if (!user) {
+            throw new Error(`User with id ${id} not found`);
+        }
+        return user;
+    }
+
+    async findByEmail(email: string): Promise<User | null> {
+        return await this.usersRepository.findOne({ where: { email } });
+    }
+}
