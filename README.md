@@ -21,6 +21,127 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
+# Learn NestJS
+
+A RESTful API built with NestJS, featuring authentication, user management, and role-based access control.
+
+## Features
+
+- 🔐 Authentication with JWT (Access Token & Refresh Token)
+- 👥 User Management (CRUD operations)
+- 👮 Role-based Access Control (Admin & User roles)
+- 📝 API Documentation with Swagger
+- 🛡️ Input Validation
+- 🔄 Database Integration with TypeORM
+- ⚙️ Environment Configuration
+- 🚀 Versioned API Support
+
+## Prerequisites
+
+- Node.js (v16 or later)
+- MySQL (v8 or later)
+- npm or yarn
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/learn-nestjs.git
+cd learn-nestjs
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Create a `.env` file:
+```bash
+cp .env.example .env
+```
+
+4. Update the `.env` file with your database credentials and other configurations.
+
+5. Create the database:
+```sql
+CREATE DATABASE nestjs_db;
+```
+
+6. Run migrations:
+```bash
+npm run migration:run
+```
+
+## Running the Application
+
+Development mode:
+```bash
+npm run start:dev
+```
+
+Production mode:
+```bash
+npm run build
+npm run start:prod
+```
+
+## API Documentation
+
+Once the application is running, you can access the Swagger documentation at:
+```
+http://localhost:3000/api
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /auth/register` - Register a new user
+- `POST /auth/login` - Login and get access & refresh tokens
+- `POST /auth/refresh` - Get new access token using refresh token
+
+### Users
+- `GET /users` - Get all users (Admin only)
+- `GET /users/:id` - Get user by ID
+- `POST /users` - Create a new user (Admin only)
+- `PUT /users/:id` - Update user
+- `DELETE /users/:id` - Delete user
+
+## Project Structure
+
+```
+src/
+├── common/           # Shared modules, services, and entities
+├── modules/          # Feature modules
+│   ├── auth/        # Authentication module
+│   └── users/       # User management module
+├── versions/         # API version implementations
+├── config/          # Configuration files
+├── interfaces/      # TypeScript interfaces
+└── main.ts          # Application entry point
+```
+
+## Security Features
+
+- JWT-based authentication
+- Password hashing with bcrypt
+- Role-based access control
+- Input validation
+- Refresh token mechanism
+- Access token expiration (15 minutes)
+- Refresh token expiration (7 days)
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
