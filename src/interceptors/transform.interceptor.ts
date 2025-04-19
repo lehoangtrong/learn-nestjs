@@ -6,7 +6,12 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiResponse } from '../interfaces/api-response.interface';
+
+export interface Response<T> {
+    data: T;
+    statusCode: number;
+    message: string;
+}
 
 /**
  * TransformInterceptor
@@ -20,7 +25,7 @@ import { ApiResponse } from '../interfaces/api-response.interface';
  */
 @Injectable()
 export class TransformInterceptor<T>
-implements NestInterceptor<T, ApiResponse<T>>
+    implements NestInterceptor<T, Response<T>>
 {
     /**
      * Phương thức intercept chuyển đổi phản hồi
@@ -31,21 +36,18 @@ implements NestInterceptor<T, ApiResponse<T>>
     intercept(
         context: ExecutionContext,
         next: CallHandler,
-    ): Observable<ApiResponse<T>> {
-        // Lấy ngữ cảnh HTTP và đối tượng phản hồi
-        const ctx = context.switchToHttp();
-        const response = ctx.getResponse();
-        // Trích xuất mã trạng thái từ phản hồi
-        const statusCode = response.statusCode;
-
-        // Xử lý trình xử lý và chuyển đổi phản hồi
+    ): Observable<Response<T>> {
         return next.handle().pipe(
-            map((data) => ({
-                data,                           // Dữ liệu phản hồi gốc
-                statusCode,                     // Mã trạng thái HTTP
-                message: 'Success',             // Thông báo thành công mặc định
-                timestamp: new Date().toISOString(), // Thời gian hiện tại
-            })),
+            map((data) => {
+                const response = context.switchToHttp().getResponse();
+                const statusCode = response.statusCode;
+                
+                return {
+                    data,
+                    statusCode,
+                    message: 'Success',
+                };
+            }),
         );
     }
 }
