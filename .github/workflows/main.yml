@@ -1,0 +1,88 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: nestjs_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create .env file
+        run: |
+          echo "DB_HOST=localhost" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_USERNAME=root" >> .env
+          echo "DB_PASSWORD=root" >> .env
+          echo "DB_DATABASE=nestjs_test" >> .env
+          echo "JWT_SECRET=test-secret" >> .env
+          echo "JWT_EXPIRATION=15m" >> .env
+          echo "JWT_REFRESH_EXPIRATION=7d" >> .env
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Run e2e tests
+        run: npm run test:e2e
+
+      - name: Build application
+        run: npm run build
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Deploy to production
+        run: |
+          # Add your deployment commands here
+          # For example, if using Heroku:
+          # heroku container:push web --app $HEROKU_APP_NAME
+          # heroku container:release web --app $HEROKU_APP_NAME
+          echo "Deployment steps will be added here"
